@@ -21,6 +21,10 @@ def convert_bot_name_reverse(name):
     bot_name_dict = {
         "Assistant": "chinchilla",
         "gpt-4": "beaver",
+        "GPT-4-128k":"vizcacha",
+        "Claude-3-Haiku-200k":"claude_3_haiku_200k",
+        "Claude-3-Sonnet":"claude_2_1_bamboo",
+        "Claude-3-Opus":"claude_2_1_cedar",
     }
 
     # 翻转字典
