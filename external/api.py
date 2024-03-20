@@ -3,7 +3,7 @@ import time
 import os
 import sys
 import logging
-from flask import stream_with_context, Flask, request
+from flask import Flask, request
 from flask_sock import Sock
 import asyncio
 from fastapi_poe.types import ProtocolMessage
@@ -50,14 +50,13 @@ async def get_responses(api_key, prompt, bot):
     print(buf)
     return buf
 
-async def strem_get_responses(api_key, prompt, bot):
-    print("strem_get_responses")
-    print("[BOT] : ", bot)
-    bot = convert_bot_name_reverse(bot)
-    message = ProtocolMessage(role="user", content=prompt)
-    # This should be an asynchronous generator yielding messages as they come in
-    async for partial in get_bot_response(messages=[message], bot_name=bot, api_key=api_key):
-        yield partial
+
+'''
+def get_client(token) -> Client:
+    print("Connecting to poe...")
+    client_poe = poe.Client(token, proxy=None if proxy == "" else proxy)
+    return client_poe
+'''
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -110,29 +109,42 @@ def ask():
         print(errmsg)
         return errmsg
 
+
 @sock.route('/stream')
-async def stream(ws):
-    token = await ws.receive()
-    bot = await ws.receive()
-    content = await ws.receive()
+def stream(ws):
+    token = ws.receive()
+    bot = ws.receive()
+    content = ws.receive()
     _add_token(token)
-    client = client_dict[token]
     try:
-        async for chunk in stream_get_responses(api_key, content, bot):
-            await ws.send(chunk.text)
+        print("stream_get_responses")
+        print("[BOT] : ", bot)
+        bot = convert_bot_name_reverse(bot)
+        message = ProtocolMessage(role="user", content=content)
+        print("[BOT] : ", bot)
+
+        # 创建一个新的事件循环
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        # 将异步函数包装在一个由事件循环运行的任务中
+        async def async_get_bot_response():
+            async for partial in get_bot_response(messages=[message], bot_name=bot, api_key=token):
+                ws.send(partial.text)
+                print(partial.text)
+
+        # 运行直到异步函数完成
+        loop.run_until_complete(async_get_bot_response())
+
     except Exception as e:
-        del client_dict[token]
-        await client.disconnect_ws()
-        errmsg = f"An exception of type {type(e).__name__} occurred. Arguments: {e.args}"
+        errmsg = f"An exception of type {e.__class__.__name__} occurred. Arguments: {e.args}"
         print(errmsg)
-        await ws.send(errmsg)
-    await ws.close()
+        ws.send(errmsg)
+    finally:
+        # 关闭事件循环
+        loop.close()
+        ws.close()
+
 
 if __name__ == '__main__':
-#    app.run(host="0.0.0.0", port=config.get('gateway-port', 5100))
-    import hypercorn.asyncio
-    from hypercorn.config import Config
-
-    config = Config()
-    config.bind = ["0.0.0.0:" + str(config.get('gateway-port', 5100))]
-    asyncio.run(hypercorn.asyncio.serve(app, config))
+    app.run(host="0.0.0.0", port=config.get('gateway-port', 5100))
