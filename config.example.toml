@@ -39,22 +39,13 @@ timeout = 15
 api-timeout = 12
 
 
-# The bot name map to use from poe.
+# The bot name map to use from poe. 
+#　
 [bot]
-	"gpt-3.5-turbo" = "chinchilla" # ChatGPT 3.5
-	"gpt-4" = "beaver" # ChatGPT 4
-	"gpt-3.5-turbo-0301" = "a2" # Claude-instant
-	"gpt-4-32k" = "a2_100k" # Claude-instant-100k
-	"gpt-4-0314" = "a2_2" # Claude+
-	"gpt-Sage" = "capybara" # Add `gpt-` prefix for ChatGPT Raycast plugin to pick these up
-	"gpt-ChatGPT" = "chinchilla"
-	"gpt-GPT-4" = "beaver"
-	"gpt-Claude-instant" = "a2"
-	"gpt-Claude-instant-100k" = "a2_100k"
-	"gpt-Claude+" = "a2_2"
-	"Sage" = "capybara"
-	"ChatGPT" = "chinchilla"
-	"GPT-4" = "beaver"
-	"Claude-instant" = "a2"
-	"Claude-instant-100k" = "a2_100k"
-	"Claude+" = "a2_2"
+        "gpt-3.5-turbo" = "chinchilla" # ChatGPT 3.5
+        "gpt-4" = "beaver" # ChatGPT 4
+        "gpt-4-turbo-preview" = "vizcacha"
+        "gpt-4-vision-preview" = "vizcacha"
+        "gpt-3.5-turbo-16k" = "claude_3_haiku_200k"
+        "gpt-4-32k" = "claude_2_1_bamboo"
+        "gpt-4-32k-0613" = "claude_2_1_cedar"
